@@ -11,8 +11,8 @@ std::vector<vec2>	makeGrid(const meridiansData& data)
 		for (int i = 0; i < data.width; ++i) 
 		{
 			n = perlin (i * data.scale, j * data.scale);
-			angle = n * 3.14159f;//n * 2.0f * 3.14159f; for all directions
-			grid[j * data.width + i] = {static_cast<float>(cos(angle)), static_cast<float>(sin(angle))};
+			angle = n * f_PI * 2.0f;//n * 2.0f * 3.14159f; for all directions
+			grid[j * data.width + i] = {static_cast<float>(cosf(angle)), static_cast<float>(sinf(angle))};
 		}
 	}
 	return (grid);
@@ -22,7 +22,7 @@ void	pushTriangles(vec2 currentP, vec2 nextP, std::vector<vec2>& allSegments, in
 {
 	vec2	v1, v2, v3, v4;
 	vec2	vect_dirr, vdirr_normal;
-	float	vdirr_len, t = 2.0f * sin( 3.14159265f * index * 0.002);
+	float	vdirr_len, t = 2.0f * sin(f_PI * index * 0.002);
 
 	vect_dirr = {nextP.x - currentP.x, nextP.y - currentP.y};
 	vdirr_len = sqrtf( vect_dirr.x * vect_dirr.x + vect_dirr.y * vect_dirr.y);

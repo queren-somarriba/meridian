@@ -13,7 +13,8 @@ SRCS_DIR = srcs
 SRCS =	$(SRCS_DIR)/meridians.cpp \
 	$(SRCS_DIR)/noise.cpp \
 	$(SRCS_DIR)/flowfield.cpp \
-	$(SRCS_DIR)/engine.cpp
+	$(SRCS_DIR)/engine.cpp \
+	$(SRCS_DIR)/poissonDiskSampling.cpp
 
 OBJ_DIR = obj
 

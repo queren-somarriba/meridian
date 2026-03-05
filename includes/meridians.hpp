@@ -8,3 +8,4 @@
 #include "noise.hpp"
 #include "flowfield.hpp"
 #include "engine.hpp"
+#include "poissonDiskSampling.hpp"

@@ -11,10 +11,10 @@ vec2 randomGradient(int ix, int iy)
 	b *= 1911520717;
 	a ^= b << s | b >> (w - s);
 	a *= 2048419325;
-	float random = a * (3.14159265f / ~(~0u >> 1));
+	float random = a * (f_PI / ~(~0u >> 1));
 	vec2 v;
-	v.x = cos(random);
-	v.y = sin(random);
+	v.x = cosf(random);
+	v.y = sinf(random);
 	
 	return v;
 }

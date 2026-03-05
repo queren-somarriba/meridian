@@ -17,7 +17,6 @@ int main(int argc, char** argv)
 	data.height = std::stoi(argv[2]);
 	data.scale = std::stof(argv[3]);//scale between 0.0f and 1.0f
 	data.stepSize = std::stof(argv[4]);
-	float startX, startY;
 
 	GLFWwindow* window = initWindow(data);
 	if (!window)
@@ -25,14 +24,17 @@ int main(int argc, char** argv)
 
 	std::vector<vec2> grid(data.width * data.height);
 	grid = makeGrid(data);
+
+	std::vector<vec2> outputList;
+	poissonDiskSampling(data, outputList);
+
 	std::vector<vec2> allSegments;
 	allSegments.reserve(2000 * 500 * 6);
 
-	for (int i = 0; i < 2000; ++i)
+	int limit = std::min(2000, (int)outputList.size());
+	for (int i = 0; i < limit; ++i)
 	{
-		startX = (static_cast<float>(std::rand()) / RAND_MAX) * data.width;
-		startY = (static_cast<float>(std::rand()) / RAND_MAX) * data.height;
-		makeSegments({startX, startY}, data, grid, allSegments);
+		makeSegments({outputList[i].x, outputList[i].y}, data, grid, allSegments);
 	}
 
 	context.vertexCount = allSegments.size();

@@ -32,7 +32,7 @@ GLFWwindow* initWindow(const meridiansData& data)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glClearColor(255.0, 255.0, 244.0, 1.0);
+	glClearColor(254.0, 254.0, 226.0, 1.0);
 
 	return window;
 }
@@ -77,8 +77,8 @@ GLuint CompileShaders()
 		"out vec4 FragColor;\n"
 		"void main()\n"
 		"{\n"
-		"vec3 colorA = vec3(29.0 / 255.0, 69.0 / 255.0, 99.0 / 255.0);\n"
-    		"vec3 colorB = vec3(212.0 / 255.0, 129.0 / 255.0, 66.0 / 255.0);\n"
+		"vec3 colorA = vec3(127.0 / 255.0, 143.0 / 255.0, 166.0 / 255.0);\n"
+    		"vec3 colorB = vec3(48.0 / 255.0, 48.0 / 255.0, 48.0 / 255.0);\n"
 		"float noiseValue = random(gl_FragCoord.xy) * 0.15;\n"
 		"vec3 finalColor = mix(colorA, colorB, v_uv.x);\n"
 		"   FragColor = vec4(finalColor, 0.8) - noiseValue;\n"
