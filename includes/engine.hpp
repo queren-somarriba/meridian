@@ -6,10 +6,10 @@
 #include <vector>
 #include "types.hpp"
 
-GLFWwindow*	initWindow(const meridiansData& data);
+GLFWwindow*	initWindow();
 
 void		SetupBuffers(const std::vector<vec2>& line, GLuint& VAO, GLuint& VBO);
 
 GLuint		CompileShaders();
 
-void		renderScene(GLFWwindow* window , renderContext& context, const meridiansData& data);
+void		renderScene(GLFWwindow* window , renderContext& context);

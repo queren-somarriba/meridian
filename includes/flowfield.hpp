@@ -4,6 +4,6 @@
 #include <vector>
 #include "noise.hpp"
 
-std::vector<vec2>	makeGrid(const meridiansData& data);
+std::vector<vec2>	makeGrid(const meridianData& data);
 
-void			makeSegments(vec2 start, const meridiansData& data, const std::vector<vec2>& grid, std::vector<vec2>& allSegments);
+void			makeSegments(vec2 start, const meridianData& data, const std::vector<vec2>& grid, std::vector<vec2>& allSegments);

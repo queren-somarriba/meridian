@@ -1,77 +1,106 @@
 #include "poissonDiskSampling.hpp"
 
-void	poissonDiskSampling(const meridiansData& data, std::vector<vec2>& outputList)
+void initPdsContext(pdsContext& ctx, std::vector<vec2>& outputList)
 {
-	float x = (static_cast<float>(std::rand()) / RAND_MAX) * data.width;
-	float y = (static_cast<float>(std::rand()) / RAND_MAX) * data.height;
+	float x = (static_cast<float>(std::rand()) / RAND_MAX) * WIDTH;
+	float y = (static_cast<float>(std::rand()) / RAND_MAX) * HEIGHT;
 	
 	outputList.push_back({x, y});
-	int countpoints = 0;
-	std::vector<int> activeList;
-	activeList.push_back(countpoints);
+	ctx.activeList.push_back(0);
 
-	float r = 25.0f, cellSize = r / sqrtf(2.0f);
-	int cols = std::ceil(data.width / cellSize);
-	int rows = std::ceil(data.height / cellSize);
-	std::vector<int> PoissonGrid(cols * rows, -1);
+	ctx.cellSize = PSD_R / sqrtf(2.0f);
+	ctx.cols = std::ceil(WIDTH / ctx.cellSize);
+	ctx.rows = std::ceil(HEIGHT / ctx.cellSize);
+	ctx.grid = std::vector<int>(ctx.cols * ctx.rows, -1);
 	
-	int gridX = static_cast<int>(x / cellSize);
-	int gridY = static_cast<int>(y / cellSize);
-	PoissonGrid[gridY * cols + gridX] = 0;
+	int gridX = static_cast<int>(x / ctx.cellSize);
+	int gridY = static_cast<int>(y / ctx.cellSize);
+	ctx.grid[gridY * ctx.cols + gridX] = 0;
+}
 
-	int	index, point;
-	float angle, len;
+vec2	generateRandomCandidate(const vec2& ref_point)
+{
+	float	angle, len, x, y;
 
-	while (activeList.size())
+	angle = 2.0f * f_PI * (static_cast<float>(std::rand()) / RAND_MAX);
+	len = PSD_R + (static_cast<float>(std::rand()) / RAND_MAX) * PSD_R;
+	x = len * cosf(angle) + ref_point.x;
+	y = len * sinf(angle) + ref_point.y;
+
+	return {x, y};
+}
+
+bool 	isCandidateValid(vec2 candidate, pdsContext& ctx, const std::vector<vec2>& outputList)
+{
+	if (candidate.x <= 0 || candidate.x >= WIDTH || candidate.y <= 0 || candidate.y >= HEIGHT)
+		return false;
+
+	int neighborID, cX, cY;
+	float dx, dy;
+
+	cX = static_cast<int>(candidate.x / ctx.cellSize);
+	cY = static_cast<int>(candidate.y / ctx.cellSize);
+
+	for (int j = -2; j <= 2; ++j)
 	{
-		index = std::rand() % activeList.size();
-		point = activeList[index];
-		bool found = false;
-
-		for (int i = 0; i < 30; ++i)
+		for (int k = -2; k <= 2; ++k)
 		{
-			angle = 2.0f * f_PI * (static_cast<float>(std::rand()) / RAND_MAX);
-			len = r + (static_cast<float>(std::rand()) / RAND_MAX) * r;
-			x = len * cosf(angle) + outputList[point].x;
-			y = len * sinf(angle) + outputList[point].y;
-
-			if (x <= 0 || x >= data.width || y <= 0 || y >= data.height)
-				continue;
-			
-			int cX = static_cast<int>(x / cellSize);
-			int cY = static_cast<int>(y / cellSize);
-			bool isValid = true;
-
-			for (int j = -2; j <= 2; ++j)
+			if (cX + j >= 0 && cX + j < ctx.cols && cY + k >= 0 && cY + k < ctx.rows)
 			{
-				for (int k = -2; k <= 2; ++k)
+				neighborID = ctx.grid[(cY + k) * ctx.cols + cX + j];//select a cell near candidate
+
+				if (neighborID != -1)//check if cell is empty
 				{
-					if (cX + j >= 0 && cX + j < cols && cY + k >= 0 && cY + k < rows)
-					{
-						int neighborID = PoissonGrid[(cY + k) * cols + cX + j];
-						if (neighborID != -1)
-						{
-								float dx = x - outputList[neighborID].x;
-								float dy = y - outputList[neighborID].y;
-								if (dx * dx + dy * dy < r * r)
-									isValid = false;
-						}
-					}
+					dx = candidate.x - outputList[neighborID].x;
+					dy = candidate.y - outputList[neighborID].y;
+
+					if (dx * dx + dy * dy < PSD_R * PSD_R)//check if the point in the cell is to close to the candidte 
+						return false;
 				}
 			}
-			if (isValid)
+		}
+	}
+
+	return true;
+}
+
+void	poissonDiskSampling(std::vector<vec2>& outputList)
+{
+	pdsContext	ctx;
+	initPdsContext(ctx, outputList);
+
+	int	index, ref_point, new_id, cX, cY;
+	vec2	candidate;
+	bool	found;
+
+	while (ctx.activeList.size())
+	{
+		index = std::rand() % ctx.activeList.size();
+		ref_point = ctx.activeList[index];//random selection of a point that "touch" empty space
+		found = false;
+
+		for (int i = 0; i < 30; ++i)//generate 30 candidates points near ref_point
+		{
+			candidate = generateRandomCandidate(outputList[ref_point]);
+
+			if (isCandidateValid(candidate, ctx, outputList))//check if a candidate is on an empty space
 			{
-				outputList.push_back({x, y});
-				PoissonGrid[cY * cols + cX] = outputList.size() - 1;
+				outputList.push_back(candidate);
+				new_id = outputList.size() - 1;
+				
+				cX = static_cast<int>(candidate.x / ctx.cellSize);
+				cY = static_cast<int>(candidate.y / ctx.cellSize);
+				ctx.grid[cY * ctx.cols + cX] = new_id;
+				
+				ctx.activeList.push_back(new_id);
 				found = true;
-				activeList.push_back(++countpoints);
 				break;
 			}
 		}
-		if (!found)
+		if (!found)//if no candidate can be founc erase ref_point of activeList
 		{
-			activeList[index] = activeList.back();
-			activeList.pop_back();
+			ctx.activeList[index] = ctx.activeList.back();
+			ctx.activeList.pop_back();
 		}
 	}
 }

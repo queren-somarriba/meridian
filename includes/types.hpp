@@ -1,7 +1,12 @@
 #pragma once
-#include <GL/glew.h>
 
-#define f_PI 3.14159265f
+#include <GL/glew.h>
+#include <vector>
+
+#define f_PI	3.14159265f
+#define WIDTH	720
+#define HEIGHT	1080
+#define PSD_R	25.0f
 
 struct vec2
 {
@@ -16,10 +21,8 @@ struct vec2
 // 	vec2	s3;
 // };
 
-struct meridiansData
+struct meridianData
 {
-	int	width;
-	int	height;
 	float	scale;
 	float	stepSize;
 };
@@ -30,4 +33,13 @@ struct renderContext
 	GLuint	VBO;
 	GLuint	shaderProgram;
 	int	vertexCount;
+};
+
+struct pdsContext
+{
+	float			cellSize;
+	int			cols;
+	int			rows;
+	std::vector<int>	grid;
+	std::vector<int>	activeList;
 };

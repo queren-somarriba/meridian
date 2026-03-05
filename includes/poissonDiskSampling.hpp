@@ -4,4 +4,4 @@
 #include <vector>
 #include "types.hpp"
 
-void	poissonDiskSampling(const meridiansData& data, std::vector<vec2>& outputList);
+void	poissonDiskSampling(std::vector<vec2>& outputList);

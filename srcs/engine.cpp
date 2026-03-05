@@ -1,6 +1,6 @@
 #include "engine.hpp"
 
-GLFWwindow* initWindow(const meridiansData& data)
+GLFWwindow* initWindow()
 {
 	if (!glfwInit())
 	{
@@ -13,7 +13,7 @@ GLFWwindow* initWindow(const meridiansData& data)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-	GLFWwindow* window = glfwCreateWindow(data.width, data.height, "Meridians", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Meridian", NULL, NULL);
 	if (!window)
 	{
 		std::cerr << "Échec de la création de la fenêtre GLFW" << std::endl;
@@ -105,7 +105,7 @@ GLuint CompileShaders()
 	return shaderProgram;
 }
 
-void renderScene(GLFWwindow* window, renderContext& context, const meridiansData& data)
+void renderScene(GLFWwindow* window, renderContext& context)
 {
 	int currentWidth, currentHeight;
 	glfwGetFramebufferSize(window, &currentWidth, &currentHeight);
@@ -115,7 +115,7 @@ void renderScene(GLFWwindow* window, renderContext& context, const meridiansData
 	glUseProgram(context.shaderProgram);
 
 	GLint u_resolutionLocaltion = glGetUniformLocation(context.shaderProgram, "u_resolution");
-	glUniform2f(u_resolutionLocaltion, static_cast<float>(data.width), static_cast<float>(data.height));
+	glUniform2f(u_resolutionLocaltion, static_cast<float>(WIDTH), static_cast<float>(HEIGHT));
 
 	glBindVertexArray(context.VAO);
 	glDrawArrays(GL_TRIANGLES, 0, context.vertexCount);

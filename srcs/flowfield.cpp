@@ -1,18 +1,18 @@
 #include "flowfield.hpp"
 
-std::vector<vec2>	makeGrid(const meridiansData& data)
+std::vector<vec2>	makeGrid(const meridianData& data)
 {
-	std::vector<vec2> grid(data.width * data.height);
+	std::vector<vec2> grid(WIDTH * HEIGHT);
 
 	float n, angle;
 
-	for (int j = 0; j < data.height; ++j)
+	for (int j = 0; j < HEIGHT; ++j)
 	{
-		for (int i = 0; i < data.width; ++i) 
+		for (int i = 0; i < WIDTH; ++i) 
 		{
 			n = perlin (i * data.scale, j * data.scale);
 			angle = n * f_PI * 2.0f;//n * 2.0f * 3.14159f; for all directions
-			grid[j * data.width + i] = {static_cast<float>(cosf(angle)), static_cast<float>(sinf(angle))};
+			grid[j * WIDTH + i] = {static_cast<float>(cosf(angle)), static_cast<float>(sinf(angle))};
 		}
 	}
 	return (grid);
@@ -45,19 +45,19 @@ void	pushTriangles(vec2 currentP, vec2 nextP, std::vector<vec2>& allSegments, in
 	allSegments.push_back(v3);
 }
 
-void	makeSegments(vec2 start, const meridiansData& data, const std::vector<vec2>& grid, std::vector<vec2>& allSegments)
+void	makeSegments(vec2 start, const meridianData& data, const std::vector<vec2>& grid, std::vector<vec2>& allSegments)
 {
 	vec2 v, nextP, currentP = start;
 	int x, y, i = -1;
 
 	while (++i < 1000)
 	{
-		if (currentP.x <= 0 || currentP.x >= data.width || currentP.y <= 0 || currentP.y >= data.height)
+		if (currentP.x <= 0 || currentP.x >= WIDTH || currentP.y <= 0 || currentP.y >= HEIGHT)
 			break;
 
 		x = static_cast<int>(currentP.x);
 		y = static_cast<int>(currentP.y);
-		v = grid[y * data.width + x];
+		v = grid[y * WIDTH + x];
 		nextP = {currentP.x + v.x * data.stepSize, currentP.y + v.y * data.stepSize};
 
 		pushTriangles(currentP, nextP, allSegments, i);

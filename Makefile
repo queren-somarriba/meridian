@@ -1,4 +1,4 @@
-NAME = meridians
+NAME = meridian
 
 CC = c++
 
@@ -10,7 +10,7 @@ GLFLAGS = -lglfw -lGLEW -framework OpenGL #-lglut -lGLEW -lGLU -lGL
 
 SRCS_DIR = srcs
 
-SRCS =	$(SRCS_DIR)/meridians.cpp \
+SRCS =	$(SRCS_DIR)/meridian.cpp \
 	$(SRCS_DIR)/noise.cpp \
 	$(SRCS_DIR)/flowfield.cpp \
 	$(SRCS_DIR)/engine.cpp \
