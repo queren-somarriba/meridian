@@ -45,23 +45,51 @@ void	pushTriangles(vec2 currentP, vec2 nextP, std::vector<vec2>& allSegments, in
 	allSegments.push_back(v3);
 }
 
-void	makeSegments(vec2 start, const meridianData& data, const std::vector<vec2>& grid, std::vector<vec2>& allSegments)
+bool	checkCollision(vec2 nextP, int currentLine, collisionContext& col_ctx)
+{
+	if (nextP.x <= 0 || nextP.x >= WIDTH || nextP.y <= 0 || nextP.y >= HEIGHT)
+		return true;
+
+	int neighborID, cX, cY;
+
+	cX = static_cast<int>(nextP.x / col_ctx.cellSize);
+	cY = static_cast<int>(nextP.y / col_ctx.cellSize);
+
+	for (int j = -2; j <= 2; ++j)
+	{
+		for (int k = -2; k <= 2; ++k)
+		{
+			if (cX + j >= 0 && cX + j < col_ctx.cols && cY + k >= 0 && cY + k < col_ctx.rows)
+			{
+				neighborID = col_ctx.grid[(cY + k) * col_ctx.cols + cX + j];//select a cell near nextP
+
+				if (neighborID != -1 && neighborID != currentLine)//check if cell is empty
+					return true;
+			}
+		}
+	}
+	
+	col_ctx.grid[cY * col_ctx.cols + cX] = currentLine;
+	return false;
+}
+
+void	makeSegments(vec2 start, const meridianData& data, const std::vector<vec2>& grid,
+		std::vector<vec2>& allSegments, int currentLine, collisionContext& col_ctx)
 {
 	vec2 v, nextP, currentP = start;
 	int x, y, i = -1;
 
-	while (++i < 1000)
+	while (++i < LINE_LENGHT)
 	{
-		if (currentP.x <= 0 || currentP.x >= WIDTH || currentP.y <= 0 || currentP.y >= HEIGHT)
-			break;
-
 		x = static_cast<int>(currentP.x);
 		y = static_cast<int>(currentP.y);
 		v = grid[y * WIDTH + x];
 		nextP = {currentP.x + v.x * data.stepSize, currentP.y + v.y * data.stepSize};
 
-		pushTriangles(currentP, nextP, allSegments, i);
+		if (checkCollision(nextP, currentLine, col_ctx))
+			return;
 
+		pushTriangles(currentP, nextP, allSegments, i);
 		currentP = nextP;
 	}
 }

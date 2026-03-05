@@ -29,12 +29,15 @@ int main(int argc, char** argv)
 	std::vector<vec2> allSegments;
 	allSegments.reserve(2000 * 500 * 6);
 
-	int limit = std::ceil(0.6f * WIDTH *  HEIGHT / PSD_R * PSD_R);
-	limit = std::min(limit , (int)outputList.size());
-	for (int i = 0; i < limit; ++i)
-	{
-		makeSegments({outputList[i].x, outputList[i].y}, data, grid, allSegments);
-	}
+	collisionContext col_ctx;
+	col_ctx.cellSize = LINE_PADDING / sqrtf(2.0f);
+	col_ctx.cols = std::ceil(WIDTH / col_ctx.cellSize);
+	col_ctx.rows = std::ceil(HEIGHT / col_ctx.cellSize);
+	col_ctx.grid = std::vector<int>(col_ctx.cols * col_ctx.rows, -1);
+
+
+	for (int i = 0; i < static_cast<int>(outputList.size()); ++i)
+		makeSegments({outputList[i].x, outputList[i].y}, data, grid, allSegments, i, col_ctx);
 
 	context.vertexCount = allSegments.size();
 	SetupBuffers(allSegments, context.VAO, context.VBO);

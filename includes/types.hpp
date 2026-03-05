@@ -3,10 +3,12 @@
 #include <GL/glew.h>
 #include <vector>
 
-#define f_PI	3.14159265f
-#define WIDTH	720
-#define HEIGHT	1080
-#define PSD_R	25.0f
+#define f_PI		3.14159265f
+#define WIDTH		720
+#define HEIGHT		1080
+#define PSD_R		10.0f
+#define LINE_PADDING	3.0f
+#define LINE_LENGHT	10000
 
 struct vec2
 {
@@ -37,9 +39,17 @@ struct renderContext
 
 struct pdsContext
 {
-	float			cellSize;
 	int			cols;
 	int			rows;
+	float			cellSize;
 	std::vector<int>	grid;
 	std::vector<int>	activeList;
+};
+
+struct collisionContext
+{
+	int			cols;
+	int			rows;
+	float			cellSize;
+	std::vector<int>	grid;
 };
