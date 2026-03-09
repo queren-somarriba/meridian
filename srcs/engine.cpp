@@ -1,4 +1,6 @@
 #include "engine.hpp"
+#include "ffmpegRecorder.hpp"
+#include "fileUtils.hpp"
 
 GLFWwindow* initWindow(const otData& data)
 {
@@ -56,63 +58,26 @@ void SetupBuffers(const std::vector<vec2>& allSegments, GLuint& VAO, GLuint& VBO
 
 GLuint CompileShaders()
 {
-	
-	const char* vertexShaderSource = "#version 330 core\n"
-		"layout (location = 0) in vec2 aPos;\n"
-		"uniform vec2 u_resolution;\n"
-		"out vec2 v_uv;\n"
-		"void main()\n"
-		"{\n"
-		"   vec2 normalizedPos = (aPos / u_resolution) * 2.0 - 1.0;\n"
-		"   normalizedPos.y *= -1.0;\n"
-		"   gl_Position = vec4(normalizedPos, 0.0, 1.0);\n"
-		"v_uv = aPos / u_resolution;\n"
-		"}\0";
-	const char* fragmentShaderSource = "#version 330 core\n"
-		"float random(vec2 p) {\n"
-		"vec3 p3  = fract(vec3(p.xyx) * 0.1031);\n"
-		"p3 += dot(p3, p3.yzx + 33.33);\n"
-		"return fract((p3.x + p3.y) * p3.z);}\n"
-		"float noise(vec2 st) {\n"
-		"vec2 i = floor(st);\n"
-		"vec2 f = fract(st);\n"
-		"float a = random(i);\n"
-		"float b = random(i + vec2(1.0, 0.0));\n"
-		"float c = random(i + vec2(0.0, 1.0));\n"
-		"float d = random(i + vec2(1.0, 1.0));\n"
-		"vec2 u = f * f * (3.0 - 2.0 * f);\n"
-		"return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;\n"
-		"}\n"
-		"float fbm(vec2 st) {\n"
-		"float value = 0.0;\n"
-		"float amplitude = 0.5;\n"
-		"for (int i = 0; i < 5; i++) {\n"
-		"	value += amplitude * noise(st);\n"
-		"	st *= 2.0;\n"
-		"	amplitude *= 0.5;\n"
-		"}\n"
-		"return value;\n"
-		"}\n"
-		"uniform float u_angle;\n"
-		"in vec2 v_uv;\n"
-		"out vec4 FragColor;\n"
-		"void main()\n"
-		"{\n"
-		"vec3 colorA = vec3(254.0 / 255.0, 254.0 / 255.0, 244.0 / 255.0);\n"
-    		"vec3 colorB = vec3(110.0 / 255.0, 110.0 / 255.0, 110.0 / 255.0);\n"
-		"float mixFactor = sin((v_uv.x + v_uv.y) * 3.0 + u_angle) * 0.5 + 0.5;\n"
-		"vec3 finalColor = mix(colorA, colorB, mixFactor);\n"
-		"float rawFbm = fbm(v_uv * 500.0);\n"
-		"float paperGrain = mix(0.85, 1.15, rawFbm);\n"
-		"FragColor = vec4(finalColor * paperGrain, 1.0);\n"
-		"}\0";
+	const char* pVSFileName = "shaders/shader.vs";
+	const char* pFSFileName = "shaders/shader.fs";
+
+	std::string vertexShaderSource = readFile(pVSFileName);
+	if (!vertexShaderSource.size())
+		exit(1);
+
+	std::string fragmentShaderSource = readFile(pFSFileName);
+	if (!fragmentShaderSource.size())
+		exit(1);
+
+	const char* fsh = fragmentShaderSource.c_str();
+	const char* vsh = vertexShaderSource.c_str();
 
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+	glShaderSource(vertexShader, 1, &vsh, NULL);
 	glCompileShader(vertexShader);
 
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+	glShaderSource(fragmentShader, 1, &fsh, NULL);
 	glCompileShader(fragmentShader);
 
 	GLuint shaderProgram = glCreateProgram();
@@ -141,13 +106,7 @@ void renderScene(GLFWwindow* window, renderContext& context, const otData& data)
 		{
 			context.currentDrawCount = context.vertexCount;
 			if (context.isRecording && context.currentDrawCount >= context.vertexCount)
-			{
-				std::cout << "Animation terminée, finalisation de la vidéo..." << std::endl;
-				pclose(context.ffmpegPipe);
-				context.ffmpegPipe = nullptr;
-				context.isRecording = false;
-				std::cout << "Vidéo sauvegardée sous outrenoir.mp4 !" << std::endl;
-			}
+				closeRecorder(context);
 		}
 	}
 
@@ -165,11 +124,7 @@ void renderScene(GLFWwindow* window, renderContext& context, const otData& data)
 	glDrawArrays(GL_TRIANGLES, 0, context.currentDrawCount);
 
 	if (context.isRecording && context.ffmpegPipe)
-	{
-		std::vector<unsigned char> pixels(currentWidth * currentHeight * 3);
-		glReadPixels(0, 0, currentWidth, currentHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
-		fwrite(pixels.data(), 1, pixels.size(), context.ffmpegPipe);
-	}
+		record(context, currentWidth, currentHeight);
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();

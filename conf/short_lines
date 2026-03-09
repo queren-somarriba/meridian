@@ -1,0 +1,8 @@
+window_width: 720
+window_height: 1080
+perlin_scale: 0.001
+step_size: 0.01 // shorter lines
+line_padding: 1.0
+pds_radius: 20.0
+speed: 100 // increase speed for faster render
+record:	0

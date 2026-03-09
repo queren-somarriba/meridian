@@ -1,0 +1,8 @@
+window_width: 600
+window_height: 600
+perlin_scale: 0.001
+step_size: 0.0007 // lines are basically points revealing the Possion disk sampling
+line_padding: 1.0
+pds_radius: 20.0
+speed: 300 // increase speed for faster render
+record:	0

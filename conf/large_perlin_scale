@@ -1,0 +1,8 @@
+window_width: 720
+window_height: 1080
+perlin_scale: 0.01 // larger scale reveals the checkerboard pattern used to build the noise
+step_size: 0.5
+line_padding: 1.0
+pds_radius: 20.0
+speed: 10
+record:	0

@@ -14,7 +14,9 @@ SRCS =	$(SRCS_DIR)/outrenoir.cpp \
 	$(SRCS_DIR)/noise.cpp \
 	$(SRCS_DIR)/flowfield.cpp \
 	$(SRCS_DIR)/engine.cpp \
-	$(SRCS_DIR)/poissonDiskSampling.cpp
+	$(SRCS_DIR)/poissonDiskSampling.cpp \
+	$(SRCS_DIR)/fileUtils.cpp \
+	$(SRCS_DIR)/ffmpegRecorder.cpp	
 
 OBJ_DIR = obj
 

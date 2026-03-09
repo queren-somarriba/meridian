@@ -83,7 +83,7 @@ void	makeSegments(vec2 start, const otData& data, const std::vector<vec2>& grid,
 	vec2 v, nextP, currentP = start;
 	int x, y, i = -1;
 
-	while (++i < 10000)
+	while (++i < MAX_ITERATIONS)
 	{
 		x = static_cast<int>(currentP.x);
 		y = static_cast<int>(currentP.y);

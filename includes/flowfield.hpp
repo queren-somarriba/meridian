@@ -4,6 +4,8 @@
 #include <vector>
 #include "math_types.hpp"
 
+constexpr int MAX_ITERATIONS = 10000;
+
 struct otData
 {
 	float	scale;
