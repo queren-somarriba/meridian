@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cmath>
-#include "types.hpp"
+#include "math_types.hpp"
 
 vec2	randomGradient(int ix, int iy);
 

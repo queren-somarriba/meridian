@@ -1,0 +1,8 @@
+window_width: 1920 // window width in pixels
+window_height: 1080 // window height in pixels
+perlin_scale: 0.001 //scale of the perlin noise = between 0.0f and 1.0f, under 0.01f for smooth render
+step_size: 0.5 // length (in pixels) of the line segment computed at each iteration (total: 10 000 iterations)
+line_padding: 1.0 // space the lines will respect to avoid each others
+pds_radius: 20.0 // space between the starting point of each lines
+speed: 10 // animation drawing speed (number of new line segments drawn per frame)
+record:	0 // 1 for a outrnoir.mp4 render video, 0 to disable recording

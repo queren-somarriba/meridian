@@ -1,18 +1,19 @@
 #include "flowfield.hpp"
+#include "noise.hpp"
 
 std::vector<vec2>	makeGrid(const otData& data)
 {
-	std::vector<vec2> grid(WIDTH * HEIGHT);
+	std::vector<vec2> grid(data.width * data.height);
 
 	float n, angle;
 
-	for (int j = 0; j < HEIGHT; ++j)
+	for (int j = 0; j < data.height; ++j)
 	{
-		for (int i = 0; i < WIDTH; ++i) 
+		for (int i = 0; i < data.width; ++i) 
 		{
-			n = perlin (i * data.scale, j * data.scale);
-			angle = n * f_PI * 2.0f;//n * 2.0f * 3.14159f; for all directions
-			grid[j * WIDTH + i] = {static_cast<float>(cosf(angle)), static_cast<float>(sinf(angle))};
+			n = perlin (i * data.scale + data.offsetX, j * data.scale + data.offsetY);
+			angle = n * f_PI * 2.0f;
+			grid[j * data.width + i] = {static_cast<float>(cosf(angle)), static_cast<float>(sinf(angle))};
 		}
 	}
 	return (grid);
@@ -45,9 +46,9 @@ void	pushTriangles(vec2 currentP, vec2 nextP, std::vector<vec2>& allSegments, fl
 	allSegments.push_back(v3);
 }
 
-bool	checkCollision(vec2 nextP, int currentLine, collisionContext& col_ctx)
+bool	checkCollision(vec2 nextP, int currentLine, collisionContext& col_ctx, const otData& data)
 {
-	if (nextP.x <= 0 || nextP.x >= WIDTH || nextP.y <= 0 || nextP.y >= HEIGHT)
+	if (nextP.x <= 0 || nextP.x >= data.width || nextP.y <= 0 || nextP.y >= data.height)
 		return true;
 
 	int neighborID, cX, cY;
@@ -82,14 +83,14 @@ void	makeSegments(vec2 start, const otData& data, const std::vector<vec2>& grid,
 	vec2 v, nextP, currentP = start;
 	int x, y, i = -1;
 
-	while (++i < LINE_LENGTH)
+	while (++i < 10000)
 	{
 		x = static_cast<int>(currentP.x);
 		y = static_cast<int>(currentP.y);
-		v = grid[y * WIDTH + x];
+		v = grid[y * data.width + x];
 		nextP = {currentP.x + v.x * data.stepSize, currentP.y + v.y * data.stepSize};
 
-		if (checkCollision(nextP, currentLine, col_ctx))
+		if (checkCollision(nextP, currentLine, col_ctx, data))
 			break;
 
 		path.push_back(nextP);

@@ -1,6 +1,6 @@
 #include "engine.hpp"
 
-GLFWwindow* initWindow()
+GLFWwindow* initWindow(const otData& data)
 {
 	if (!glfwInit())
 	{
@@ -13,7 +13,7 @@ GLFWwindow* initWindow()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "outrenoir", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(data.width, data.height, "outrenoir", NULL, NULL);
 	if (!window)
 	{
 		std::cerr << "Échec de la création de la fenêtre GLFW" << std::endl;
@@ -73,17 +73,38 @@ GLuint CompileShaders()
 		"vec3 p3  = fract(vec3(p.xyx) * 0.1031);\n"
 		"p3 += dot(p3, p3.yzx + 33.33);\n"
 		"return fract((p3.x + p3.y) * p3.z);}\n"
-		"uniform vec3 colorA = vec3(254.0 / 255.0, 254.0 / 255.0, 244.0 / 255.0);\n"
-    		"uniform vec3 colorB = vec3(110.0 / 255.0, 110.0 / 255.0, 110.0 / 255.0);\n"
+		"float noise(vec2 st) {\n"
+		"vec2 i = floor(st);\n"
+		"vec2 f = fract(st);\n"
+		"float a = random(i);\n"
+		"float b = random(i + vec2(1.0, 0.0));\n"
+		"float c = random(i + vec2(0.0, 1.0));\n"
+		"float d = random(i + vec2(1.0, 1.0));\n"
+		"vec2 u = f * f * (3.0 - 2.0 * f);\n"
+		"return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;\n"
+		"}\n"
+		"float fbm(vec2 st) {\n"
+		"float value = 0.0;\n"
+		"float amplitude = 0.5;\n"
+		"for (int i = 0; i < 5; i++) {\n"
+		"	value += amplitude * noise(st);\n"
+		"	st *= 2.0;\n"
+		"	amplitude *= 0.5;\n"
+		"}\n"
+		"return value;\n"
+		"}\n"
+		"uniform float u_angle;\n"
 		"in vec2 v_uv;\n"
 		"out vec4 FragColor;\n"
 		"void main()\n"
 		"{\n"
-		// "vec3 colorA = vec3(254.0 / 255.0, 254.0 / 255.0, 244.0 / 255.0);\n"
-    		// "vec3 colorB = vec3(110.0 / 255.0, 110.0 / 255.0, 110.0 / 255.0);\n"
-		"float noiseValue = random(gl_FragCoord.xy) * 0.15;\n"
-		"vec3 finalColor = mix(colorA, colorB, v_uv.x);\n"
-		"   FragColor = vec4(finalColor, 0.8) - noiseValue;\n"
+		"vec3 colorA = vec3(254.0 / 255.0, 254.0 / 255.0, 244.0 / 255.0);\n"
+    		"vec3 colorB = vec3(110.0 / 255.0, 110.0 / 255.0, 110.0 / 255.0);\n"
+		"float mixFactor = sin((v_uv.x + v_uv.y) * 3.0 + u_angle) * 0.5 + 0.5;\n"
+		"vec3 finalColor = mix(colorA, colorB, mixFactor);\n"
+		"float rawFbm = fbm(v_uv * 500.0);\n"
+		"float paperGrain = mix(0.85, 1.15, rawFbm);\n"
+		"FragColor = vec4(finalColor * paperGrain, 1.0);\n"
 		"}\0";
 
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -107,7 +128,7 @@ GLuint CompileShaders()
 	return shaderProgram;
 }
 
-void renderScene(GLFWwindow* window, renderContext& context)
+void renderScene(GLFWwindow* window, renderContext& context, const otData& data)
 {
 	int currentWidth, currentHeight;
 	glfwGetFramebufferSize(window, &currentWidth, &currentHeight);
@@ -134,7 +155,10 @@ void renderScene(GLFWwindow* window, renderContext& context)
 	glUseProgram(context.shaderProgram);
 
 	GLint u_resolutionLocaltion = glGetUniformLocation(context.shaderProgram, "u_resolution");
-	glUniform2f(u_resolutionLocaltion, static_cast<float>(WIDTH), static_cast<float>(HEIGHT));
+	glUniform2f(u_resolutionLocaltion, static_cast<float>(data.width), static_cast<float>(data.height));
+
+	GLint u_angleLocation = glGetUniformLocation(context.shaderProgram, "u_angle");
+	glUniform1f(u_angleLocation, context.u_angle);
 
 	glBindVertexArray(context.VAO);
 

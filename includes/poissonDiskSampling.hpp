@@ -2,6 +2,16 @@
 
 #include <cmath>
 #include <vector>
-#include "types.hpp"
+#include "flowfield.hpp"
+#include "math_types.hpp"
 
-void	poissonDiskSampling(std::vector<vec2>& outputList);
+struct pdsContext
+{
+	std::vector<int>	grid;
+	std::vector<int>	activeList;
+	float			cellSize;
+	int			cols;
+	int			rows;
+};
+
+void	poissonDiskSampling(std::vector<vec2>& outputList, const otData& data);
