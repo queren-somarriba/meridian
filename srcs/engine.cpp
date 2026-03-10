@@ -6,7 +6,7 @@ GLFWwindow* initWindow(const otData& data)
 {
 	if (!glfwInit())
 	{
-		std::cerr << "Échec de l'initialisation de GLFW" << std::endl;
+		std::cerr << "GLFW initialization failed" << std::endl;
 		return NULL;
 	}
 
@@ -18,7 +18,7 @@ GLFWwindow* initWindow(const otData& data)
 	GLFWwindow* window = glfwCreateWindow(data.width, data.height, "outrenoir", NULL, NULL);
 	if (!window)
 	{
-		std::cerr << "Échec de la création de la fenêtre GLFW" << std::endl;
+		std::cerr << "Failed to create the GLFW window" << std::endl;
 		glfwTerminate();
 		return NULL;
 	}
@@ -28,7 +28,7 @@ GLFWwindow* initWindow(const otData& data)
 	GLenum res = glewInit();
 	if (res != GLEW_OK)
 	{
-		std::cerr << "Erreur: " << glewGetErrorString(res) << std::endl;
+		std::cerr << "Error: " << glewGetErrorString(res) << std::endl;
 		return NULL;
 	}
 	glEnable(GL_BLEND);
@@ -62,12 +62,18 @@ GLuint CompileShaders()
 	const char* pFSFileName = "shaders/shader.fs";
 
 	std::string vertexShaderSource = readFile(pVSFileName);
-	if (!vertexShaderSource.size())
-		exit(1);
+	if (vertexShaderSource.empty())
+        {
+                std::cerr << "Error: Unable to read " << pVSFileName << std::endl;
+                return 0;
+        }
 
 	std::string fragmentShaderSource = readFile(pFSFileName);
-	if (!fragmentShaderSource.size())
-		exit(1);
+	if (fragmentShaderSource.empty())
+        {
+                std::cerr << "Error: Unable to read " << pVSFileName << std::endl;
+                return 0;
+        }
 
 	const char* fsh = fragmentShaderSource.c_str();
 	const char* vsh = vertexShaderSource.c_str();

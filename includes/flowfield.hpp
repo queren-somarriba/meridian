@@ -31,7 +31,7 @@ struct collisionContext
 std::vector<vec2>	makeGrid(const otData& data);
 
 void			makeSegments(vec2 start, const otData& data,
-		const std::vector<vec2>& grid, std::vector<vec2>& allSegments,
-			int currentLine, collisionContext& col_ctx);
+				const std::vector<vec2>& grid, std::vector<vec2>& allSegments,
+					int currentLine, collisionContext& col_ctx);
 
-float			fbm_perlin(float x, float y);
+std::vector<vec2>	flowfield(const otData& data);

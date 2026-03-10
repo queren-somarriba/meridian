@@ -53,5 +53,4 @@ float perlin(float x, float y)
 	
 	float res = std::abs(interpolate(ix0, ix1, sy));
 	return 1.0f - (res * res);
-	//return interpolate(ix0, ix1, sy);
 }

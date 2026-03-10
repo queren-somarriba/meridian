@@ -1,5 +1,6 @@
 #include "flowfield.hpp"
 #include "noise.hpp"
+#include "poissonDiskSampling.hpp"
 
 std::vector<vec2>	makeGrid(const otData& data)
 {
@@ -108,4 +109,28 @@ void	makeSegments(vec2 start, const otData& data, const std::vector<vec2>& grid,
 			pushTriangles(path[j], path[j + 1], allSegments, t);
 		}
 	}
+}
+
+std::vector<vec2> flowfield(const otData& data)
+{
+	std::vector<vec2> grid(data.width * data.height);
+	grid = makeGrid(data);
+
+	std::vector<vec2> outputList;
+	poissonDiskSampling(outputList, data);
+
+	std::vector<vec2> allSegments;
+	allSegments.reserve(2000 * 500 * 6);
+
+	collisionContext col_ctx;
+	col_ctx.cellSize = data.line_padding / sqrtf(2.0f);
+	col_ctx.cols = std::ceil(data.width / col_ctx.cellSize);
+	col_ctx.rows = std::ceil(data.height / col_ctx.cellSize);
+	col_ctx.grid = std::vector<int>(col_ctx.cols * col_ctx.rows, -1);
+
+
+	for (int i = 0; i < static_cast<int>(outputList.size()); ++i)
+		makeSegments({outputList[i].x, outputList[i].y}, data, grid, allSegments, i, col_ctx);
+
+	return allSegments;
 }

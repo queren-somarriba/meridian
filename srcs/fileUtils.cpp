@@ -11,13 +11,13 @@ bool fileExist(const std::string& name)
 
 std::string readFile(const char* fileName)
 {
-	std::fstream file(fileName, std::ios::in | std::ios::binary);
+	std::ifstream file(fileName, std::ios::in | std::ios::binary);
 	
-	if (file.fail())
+	if (!file.is_open())
 		return ("");
 	
 	file.seekg(0, file.end);
-	int len = file.tellg();
+	std::streampos len = file.tellg();
 	file.seekg(0, file.beg);
 	std::string outfile;
 	outfile.resize(len);
