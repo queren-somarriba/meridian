@@ -12,7 +12,7 @@ This project was built from scratch without external game engines, implementing 
 
 * Spatial Hashing: Optimized collision detection system using a spatial grid to prevent geometry overlap with high performance.
 
-C* ustom GLSL Shaders:
+* Custom GLSL Shaders:
 
 * Dynamic lighting with randomized orientation on each execution.
 
@@ -31,37 +31,31 @@ To compile and run this project, your system must have the following libraries i
 
 * GLEW (OpenGL extension loading)
 
-F* Fmpeg (Optional, required only for video export)
+* FFmpeg (Optional, required only for video export)
 
 ### Compilation
 A Makefile is provided at the root of the project. Simply use the standard command:
-```
-Bash
+```Bash
 make
 ```
-# ⚙️ Usage and Configuration
+### ⚙️ Usage and Configuration
 The program takes a configuration text file as an argument, allowing you to modify the mathematical and visual behavior of the engine without recompiling.
-```
-Bash
+```Bash
 ./outrenoir conf/config
 ```
 ### The Configuration File
 The parser reads key: value pairs. Here are the available parameters:
-
-Parameter	Description
-window_width	Render window width (e.g., 1920).
-window_height	Render window height (e.g., 1080).
-perlin_scale	
-Zoom level in the Perlin noise.
-
-
-(< 0.01 for smooth curves, > 0.01 to reveal the mathematical grid).
-
-step_size	Length (in pixels) of the segment computed at each iteration.
-line_padding	Guaranteed empty space around each line (manages the collision zone).
-pds_radius	Exclusion radius (in pixels) for the starting point of each line.
-speed	Animation speed (number of new segments drawn per frame).
-record	1 to record an outrenoir.mp4 file, 0 to disable recording.
+| Parameter | Description |
+| :--- | :--- |
+| window_width | Render window width (e.g., 1920) |
+| window_height | Render window height (e.g., 1080) |
+| perlin_scale | Zoom level in the Perlin noise (< 0.01 for smooth curves, > 0.01 to reveal the mathematical grid) |
+| step_size | Length (in pixels) of the segment computed at each iteration |
+| line_padding | Guaranteed empty space around each line (manages the collision zone) |	
+| pds_radius | Exclusion radius (in pixels) for the starting point of each line |
+| speed | Animation speed (number of new segments drawn per frame) |
+| record | 1 to record an outrenoir.mp4 file, 0 to disable recording |
+		
 💡 Rendering Tip (Pointillism): By setting an extremely low step_size (e.g., 0.0007) and a high speed, the engine will draw suspension points revealing the initial Poisson Disk Sampling placement.
 
 ### 🏗️ Code Architecture
